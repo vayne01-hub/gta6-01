@@ -17,7 +17,6 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildDossier } from './vendor/makefun-game.ts';
 import { readFileSync, readdirSync } from 'node:fs';
-import { canonicalJson } from './vendor/makefun-game.ts';
 
 // ---- game metadata: an extra dossier section saying what the game itself is ----
 // buildDossier summarises the hand-in (its schema, the cover, the source text and the screenshot
@@ -115,11 +114,3 @@ writeFileSync(
     game_path_max_bytes: 1000,
   }),
 );
-
-// Set the game section on the dossier buildDossier just wrote: read its canonical bytes back,
-// add the one key and write the dossier again in the same canonical spelling (sorted keys, no
-// spaces), so the file keeps one spelling per value and stays identical from run to run.
-const dossierPath = join(out, 'dossier.json');
-const dossier = JSON.parse(readFileSync(dossierPath, 'utf8')) as Record<string, unknown>;
-dossier.game = gameSection(here);
-writeFileSync(dossierPath, canonicalJson(dossier));
