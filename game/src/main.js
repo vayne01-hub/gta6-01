@@ -58,9 +58,11 @@ function updateCamera(dt) {
   if (G.state.mode === 'menu') return;
   const focus = G.state.inCar && G.state.currentCar
     ? G.state.currentCar.pos : G.player.pos;
-  const yaw = G.state.inCar && G.state.currentCar ? G.state.currentCar.angle + Math.PI : camera.yaw;
-  const dist = G.state.inCar ? 11 : 8;
-  const height = G.state.inCar ? 4.6 : 3.4;
+  // Camera sits behind the direction of travel: yaw equals the car's
+  // heading while driving, the mouse-orbit yaw on foot.
+  const yaw = G.state.inCar && G.state.currentCar ? G.state.currentCar.angle : camera.yaw;
+  const dist = G.state.inCar ? 13 : 8;
+  const height = G.state.inCar ? 5.5 : 3.4;
   const tx = focus.x - Math.sin(yaw) * dist;
   const tz = focus.z - Math.cos(yaw) * dist;
   const ty = focus.y + height;
@@ -221,14 +223,17 @@ function applyShotPreset() {
   }
   if (shot === 'drive' || shot === 'chase') {
     const car = G.cars[0];
+    car.stolen = true; // the cover car is the player's own for the shot
+    car.angle = 0; // face along the road (x=6 strip) so the shot stays on asphalt
     G.player.pos.set(car.pos.x, 0, car.pos.z);
     enterCar(G, car);
     car.speed = 24;
-    G.state.wanted = 0;
     if (shot === 'chase') {
       G.police.addHeat(3.0);
       G.police.cars.forEach((c, i) => {
-        c.pos.set(car.pos.x - 18 - i * 8, 0, car.pos.z - 26 - i * 6);
+        // Park the pursuers ahead-side, in frame, closing in.
+        c.pos.set(car.pos.x + (i === 0 ? -13 : 13), 0, car.pos.z + 22 + i * 12);
+        c.speed = 20;
       });
     }
   }
@@ -247,7 +252,7 @@ window.__NB = {
   state: G.state,
   start: () => startGame(false),
   enterNearestCar: () => { const c = nearestCar(G, G.player.pos, 30); if (c) enterCar(G, c); return !!c; },
-  setWanted: (n) => { G.police.heat = n; G.state.wanted = n; G.hud.updateWanted(); },
+  setWanted: (n) => { G.police.heat = n + 0.9; G.state.wanted = n; G.hud.updateWanted(); },
   startMission: () => G.missions.start(),
   mission: () => ({ index: G.missions.index, stage: G.missions.stage, sub: G.missions.sub }),
   teleport: (x, z) => { G.player.pos.set(x, 0, z); G.player.group.position.copy(G.player.pos); },

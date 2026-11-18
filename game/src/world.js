@@ -24,11 +24,11 @@ function windowTexture(rng) {
   const c = document.createElement('canvas');
   c.width = 64; c.height = 128;
   const g = c.getContext('2d');
-  g.fillStyle = '#20242c'; g.fillRect(0, 0, 64, 128);
+  g.fillStyle = '#a8adb5'; g.fillRect(0, 0, 64, 128);
   for (let y = 6; y < 122; y += 10) {
     for (let x = 5; x < 58; x += 9) {
       const lit = rng() < 0.42;
-      g.fillStyle = lit ? (rng() < 0.7 ? '#ffd98a' : '#9fd8ff') : '#12151c';
+      g.fillStyle = lit ? (rng() < 0.7 ? '#ffe9b0' : '#cfeaff') : '#4a5058';
       g.fillRect(x, y, 6, 7);
     }
   }
@@ -58,8 +58,10 @@ export function buildWorld(G) {
   sun.shadow.camera.left = -320; sun.shadow.camera.right = 320;
   sun.shadow.camera.top = 320; sun.shadow.camera.bottom = -320;
   sun.shadow.camera.far = 800;
+  sun.shadow.bias = -0.0004;
+  sun.shadow.normalBias = 1.5;
   scene.add(sun);
-  scene.add(new THREE.HemisphereLight(0xbfe3ff, 0x8a7a5c, 0.9));
+  scene.add(new THREE.HemisphereLight(0xbfe3ff, 0x8a7a5c, 1.5));
   W.sun = sun;
 
   // Ground: grass-green city slab, sand beach, blue ocean.

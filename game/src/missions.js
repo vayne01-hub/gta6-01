@@ -112,7 +112,7 @@ export function createMissions(G) {
       G.audio.play('complete');
       G.hud.feed(`Job complete! +$${def.reward}.`);
       G.hud.setMission('NEON BAY', 'Job done. Walk to the next marker to start the next job.');
-      M.stage = 'done';
+      M.stage = 'idle'; // back to idle so the pier marker can start the next job
       M.index += 1;
       G.save.saveGame();
       if (M.index >= MISSION_DEFS.length) {

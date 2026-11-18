@@ -46,13 +46,17 @@ export function updatePlayer(G, dt) {
   if (input.keys.has('KeyD')) fx += 1;
   const moving = fx !== 0 || fz !== 0;
   p.walking = moving;
-  const camYaw = G.camera.yaw;
-  const sin = Math.sin(camYaw), cos = Math.cos(camYaw);
+  // Move relative to the camera: W is away from the camera (screen-up),
+  // D is screen-right — computed from the camera's real view direction.
+  const fwd = new THREE.Vector3();
+  G.camera.getWorldDirection(fwd);
+  fwd.y = 0; fwd.normalize();
+  const right = new THREE.Vector3().crossVectors(fwd, new THREE.Vector3(0, 1, 0));
   let mx = 0, mz = 0;
   if (moving) {
     const len = Math.hypot(fx, fz); fx /= len; fz /= len;
-    mx = fx * cos - fz * sin;
-    mz = fx * sin + fz * cos;
+    mx = fwd.x * (-fz) + right.x * fx;
+    mz = fwd.z * (-fz) + right.z * fx;
     p.speed = walkSpeed;
     p.angle = Math.atan2(mx, mz);
     const nx = p.pos.x + mx * walkSpeed * dt;
